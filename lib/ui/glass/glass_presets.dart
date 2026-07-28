@@ -1,0 +1,215 @@
+import 'dart:math' as math;
+import 'package:flutter/cupertino.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
+
+/// Recommended glass settings optimized for the calibrated lightweight shader.
+///
+/// These settings provide the best iOS 26 liquid glass appearance across
+/// both Skia (standard) and Impeller (premium) renderers.
+///
+/// ## lightAngle Convention
+///
+/// `lightAngle` is in **radians**, measured from the positive-x axis
+/// (right), counter-clockwise in standard math coords (which maps
+/// clockwise on screen since screen-y points down).
+///
+/// Common values:
+/// - `0.5  * pi` = 90°  → directly above (API default)
+/// - `0.75 * pi` = 135° → upper-left  (Apple standard — all iOS 26 surfaces)
+///
+/// Apple uses a **single consistent upper-left light source** across all glass
+/// surfaces. Do not vary the angle per-component — it breaks visual coherence.
+///
+/// ## refractiveIndex Parameter Guide:
+///
+/// **Standard Quality (Lightweight Shader - Skia):**
+/// - Controls rim prominence/thickness
+/// - Range: 0.7-2.0
+///   - `0.7-1.0`: Thin delicate rim (iOS 26 default aesthetic)
+///   - `1.0-1.5`: Moderate rim visibility
+///   - `1.5-2.0`: Bold prominent rim
+///
+/// **Premium Quality (Full Shader - Impeller):**
+/// - Controls actual light refraction through glass
+/// - Range: 1.0-2.0
+///   - `1.0-1.2`: Subtle refraction
+///   - `1.2-1.5`: Noticeable refraction
+///   - `1.5-2.0`: Strong refraction
+class RecommendedGlassSettings {
+  const RecommendedGlassSettings._();
+
+  /// Standard settings for scrollable content.
+  ///
+  /// Optimized for performance with excellent visual quality.
+  /// Use with `GlassQuality.standard` (default).
+  ///
+  /// - refractiveIndex: 0.7 = thin delicate rim (standard) / subtle refraction (premium)
+  static const standard = LiquidGlassSettings(
+    blur: 4,
+    thickness: 10,
+    glassColor: Color.fromRGBO(255, 255, 255, 0.08),
+    lightAngle: 0.75 * math.pi, // 135° — upper-left, matches iOS 26
+    lightIntensity: 0.7,
+    ambientStrength: 0,
+    saturation: 1.2,
+    refractiveIndex: 1.2,
+    chromaticAberration: 0.01,
+    specularSharpness: GlassSpecularSharpness.medium,
+  );
+
+  /// Settings for buttons and interactive elements.
+  ///
+  /// Optimized for interactive feedback with adaptive glow effects.
+  ///
+  /// - refractiveIndex: 0.7 = thin delicate rim (iOS 26 aesthetic)
+  /// - saturation: 0.0 at rest, automatically animated to 1.0 on press
+  ///   - On Impeller: GlassGlow handles advanced compositing
+  ///   - On Skia: Shader glow provides frosted press feedback
+  static const interactive = LiquidGlassSettings(
+    blur: 10,
+    thickness: 10,
+    glassColor: Color.fromRGBO(255, 255, 255, 0.2),
+    lightAngle: 0.75 * math.pi, // 135° — upper-left, matches iOS 26
+    lightIntensity: 0.7,
+    ambientStrength: 0.3,
+    saturation: 0.0, // Glow intensity (0.0=off, animated on press)
+    refractiveIndex: 0.7, // Thin rim (standard) / subtle refraction (premium)
+    chromaticAberration: 0.0,
+  );
+
+  /// Settings for static surfaces (app bars, toolbars).
+  ///
+  /// Can use premium quality for best visual impact.
+  ///
+  /// - refractiveIndex: 1.15 = moderate rim (standard) / subtle refraction (premium)
+  static const surface = LiquidGlassSettings(
+    blur: 10,
+    thickness: 10,
+    glassColor: Color.fromRGBO(255, 255, 255, 0.2),
+    lightAngle: 0.75 * math.pi, // 135° — upper-left, matches iOS 26
+    lightIntensity: 0.7,
+    ambientStrength: 0.3,
+    saturation: 1.2,
+    refractiveIndex:
+        1.15, // Moderate rim (standard) / subtle refraction (premium)
+    chromaticAberration: 0.0,
+  );
+
+  /// Settings for bottom navigation bars.
+  ///
+  /// Tuned to Apple's iOS 26 bottom bar specification:
+  /// - blur: 20 — Apple's nav chrome uses ~20pt heavy frost
+  /// - glassColor: 15% white — adequate weight on diverse wallpapers
+  /// - lightAngle: 0.75*pi — upper-left, same as all other surfaces (Apple standard)
+  /// - refractiveIndex: 1.2 = moderate rim (standard) / noticeable refraction (premium)
+  static const bottomBar = LiquidGlassSettings(
+    blur: 20,
+    thickness: 20,
+    glassColor: Color.fromRGBO(255, 255, 255, 0.15),
+    lightAngle:
+        0.75 *
+        math.pi, // 135° — upper-left, Apple standard (consistent across all surfaces)
+    lightIntensity: 0.7,
+    ambientStrength: 0.5,
+    saturation: 1.2,
+    refractiveIndex:
+        1.2, // Moderate rim (standard) / noticeable refraction (premium)
+    chromaticAberration: 0.0,
+  );
+
+  /// Settings for overlay page layers, cards, and buttons.
+  ///
+  /// Use this for [AdaptiveLiquidGlassLayer] and [GlassCard]/[GlassButton]
+  /// within an overlays page context.
+  ///
+  /// - refractiveIndex: 0.7 = thin delicate rim (iOS 26 aesthetic for small widgets)
+  static const overlay = LiquidGlassSettings(
+    blur: 10,
+    thickness: 10,
+    glassColor: Color.fromRGBO(255, 255, 255, 0.12),
+    lightAngle: 0.75 * math.pi, // 135° — upper-left, matches iOS 26
+    lightIntensity: 0.7,
+    ambientStrength: 0.4,
+    saturation: 1.2,
+    refractiveIndex:
+        0.7, // Thin rim for cards/buttons (standard / subtle refraction premium)
+    chromaticAberration: 0.0,
+  );
+
+  /// Settings specifically for large bottom sheets and modal overlays.
+  ///
+  /// Use this as the [settings] parameter in [GlassSheet.show] and
+  /// [GlassModalSheet.show] to avoid the hard "line" artifact on large
+  /// surfaces that use the lightweight shader.
+  ///
+  /// The lightweight shader's rim opacity is derived from kRimAlphaBase(0.65)
+  /// × directional/ambient factors × refractiveIndex.
+  /// - At 0.7 (overlay preset): visible rim border on sheets
+  /// - At 0.15 (this preset):   barely-perceptible glassy edge
+  static const sheet = LiquidGlassSettings(
+    blur: 10,
+    thickness: 10,
+    glassColor: Color.fromRGBO(255, 255, 255, 0.12),
+    lightAngle: 0.75 * math.pi, // 135° — upper-left, matches iOS 26
+    lightIntensity: 0.7,
+    ambientStrength: 0.4,
+    saturation: 1.2,
+    refractiveIndex:
+        0.15, // Near-invisible rim — correct for large sheet surfaces
+    chromaticAberration: 0.0,
+  );
+
+  /// Settings for input fields.
+  ///
+  /// Subtle appearance that doesn't distract from content.
+  ///
+  /// - refractiveIndex: 0.7 = thin delicate rim (iOS 26 aesthetic)
+  static const input = LiquidGlassSettings(
+    blur: 20,
+    thickness: 10,
+    glassColor: Color.fromRGBO(255, 255, 255, 0.12),
+    lightAngle: 0.75 * math.pi, // 135° — upper-left, matches iOS 26
+    lightIntensity: 0.7,
+    ambientStrength: 0.4,
+    saturation: 1.2,
+    refractiveIndex: 0.7, // Thin rim (standard) / subtle refraction (premium)
+    chromaticAberration: 0.0,
+  );
+
+  /// Settings for app-style floating bottom bars (Apple app clones).
+  ///
+  /// This is the recipe that was duplicated inline across the Apple Music,
+  /// News, and Podcasts recreations (thickness 30, light blur, subtle
+  /// chromatic aberration). Brightness-aware: pass the current [Brightness].
+  ///
+  /// Matches the visual weight of the real iOS 26 Music/Podcasts bars.
+  static LiquidGlassSettings appBottomBar(Brightness brightness) =>
+      LiquidGlassSettings(
+        glassColor: brightness == Brightness.dark
+            ? const Color(0xCC1C1C1E)
+            : const Color(0xCCF2F2F7),
+        thickness: 30,
+        blur: 4,
+        chromaticAberration: .01,
+        lightAngle: GlassDefaults.lightAngle,
+        lightIntensity: .5,
+        ambientStrength: 0,
+        refractiveIndex: 1.2,
+        saturation: 1.2,
+        specularSharpness: GlassSpecularSharpness.medium,
+      );
+
+  /// Settings for the home screen's hero bottom tab bar (main.dart).
+  static const homeBottomBar = LiquidGlassSettings(
+    glassColor: Color.fromRGBO(255, 255, 255, 0.08),
+    thickness: 30,
+    blur: 3,
+    chromaticAberration: .01,
+    lightAngle: GlassDefaults.lightAngle,
+    lightIntensity: .5,
+    ambientStrength: 0,
+    refractiveIndex: 1.2,
+    saturation: 1.2,
+    specularSharpness: GlassSpecularSharpness.medium,
+  );
+}

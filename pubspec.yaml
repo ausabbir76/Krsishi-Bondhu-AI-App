@@ -1,0 +1,50 @@
+name: krishi_bondhu_ai_app
+description: "KrishiBondhu AI — agricultural assistant app for Bangladeshi farmers."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  liquid_glass_widgets: ^0.24.3
+  flutter_localizations:
+    sdk: flutter
+  flutter_riverpod: ^3.4.1
+  shared_preferences: ^2.5.5
+  go_router: ^17.3.0
+  connectivity_plus: ^7.3.1
+  logger: ^2.7.0
+  dio: ^5.11.0
+  flutter_secure_storage: ^10.3.1
+  image_picker: ^1.2.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter:
+  generate: true
+
+  uses-material-design: true
+  fonts:
+    - family: SFSymbols
+      fonts:
+        - asset: assets/fonts/SFSymbols.ttf
+  assets:
+    - assets/icon/icon.png
+    - assets/wallpaper.jpg
+    - assets/wallpaper_dark.jpg
+    - assets/mountain_landscape.jpg
+    - assets/bulldog.jpeg
+    - assets/news_logo.svg
+    - assets/audio.svg
+    - assets/following.svg
+    - assets/news_images/
+    - assets/modal_sheet_showcase/
+    - assets/podcast_images/
