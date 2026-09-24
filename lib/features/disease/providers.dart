@@ -6,8 +6,7 @@ import '../settings/providers.dart';
 import 'data/disease_repository.dart';
 import 'data/disease_result.dart';
 
-/// Repository provider — swap `analyzeMock` for `analyze` in [ScanController]
-/// when the vision backend is live.
+/// Repository provider for the live disease-detection backend.
 final diseaseRepositoryProvider = Provider<DiseaseRepository>(
   (ref) => DiseaseRepository(ref.watch(apiClientProvider)),
 );
@@ -48,7 +47,7 @@ class ScanController extends Notifier<ScanState> {
     if (path == null || state.analyzing) return;
 
     state = state.copyWith(analyzing: true);
-    final result = await ref.read(diseaseRepositoryProvider).analyzeMock(
+    final result = await ref.read(diseaseRepositoryProvider).analyze(
         path,
         locale: ref.read(languageControllerProvider));
     state = switch (result) {

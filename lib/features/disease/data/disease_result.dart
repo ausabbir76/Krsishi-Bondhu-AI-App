@@ -8,6 +8,7 @@ class DiseaseResult {
     required this.organicTreatment,
     required this.chemicalTreatment,
     required this.prevention,
+    this.aiAdvice,
   });
 
   final String disease;
@@ -21,6 +22,7 @@ class DiseaseResult {
   final String organicTreatment;
   final String chemicalTreatment;
   final String prevention;
+  final String? aiAdvice;
 
   factory DiseaseResult.fromJson(Map<String, dynamic> json) => DiseaseResult(
         disease: json['disease'] as String,
@@ -30,5 +32,16 @@ class DiseaseResult {
         organicTreatment: json['organicTreatment'] as String,
         chemicalTreatment: json['chemicalTreatment'] as String,
         prevention: json['prevention'] as String,
+        aiAdvice: _readAdvice(json),
       );
+}
+
+String? _readAdvice(Map<String, dynamic> json) {
+  final advice = json['advice'] ?? json['aiAdvice'] ?? json['aiSuggestions'];
+  if (advice is String && advice.trim().isNotEmpty) return advice.trim();
+  if (advice is Map<String, dynamic>) {
+    final text = advice['text'] ?? advice['message'] ?? advice['en'] ?? advice['bn'];
+    if (text is String && text.trim().isNotEmpty) return text.trim();
+  }
+  return null;
 }

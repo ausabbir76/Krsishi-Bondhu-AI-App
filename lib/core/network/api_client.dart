@@ -75,13 +75,29 @@ class ApiClient {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
-        return NetworkException('Request timed out', cause: e, stackTrace: st);
+        return NetworkException(
+          'The server is not responding. Please check if the KrishiBondhu server is online and try again.',
+          cause: e,
+          stackTrace: st,
+        );
       case DioExceptionType.connectionError:
-        return NetworkException('No internet connection', cause: e, stackTrace: st);
+        return NetworkException(
+          'No internet connection. Please check your mobile data or Wi-Fi and try again.',
+          cause: e,
+          stackTrace: st,
+        );
       case DioExceptionType.badResponse:
         final status = e.response?.statusCode;
         if (status == 401 || status == 403) {
           return UnauthorizedException('Not authorized', cause: e, stackTrace: st);
+        }
+        if (status == 502 || status == 503 || status == 504) {
+          return ServerException(
+            'The KrishiBondhu AI server is offline right now. Please try again after the server is started.',
+            statusCode: status,
+            cause: e,
+            stackTrace: st,
+          );
         }
         return ServerException(
           'Server error ($status)',
@@ -94,10 +110,18 @@ class ApiClient {
       case DioExceptionType.badCertificate:
         return NetworkException('Bad certificate', cause: e, stackTrace: st);
       case DioExceptionType.unknown:
-        return UnknownException('Network error', cause: e, stackTrace: st);
+        return UnknownException(
+          'Network error. Please check your internet connection and server availability.',
+          cause: e,
+          stackTrace: st,
+        );
       // ignore: unreachable_switch_case — future-proof against new enum values
       default:
-        return UnknownException('Network error', cause: e, stackTrace: st);
+        return UnknownException(
+          'Network error. Please check your internet connection and server availability.',
+          cause: e,
+          stackTrace: st,
+        );
     }
   }
 }
@@ -110,6 +134,7 @@ final dioProvider = Provider<Dio>((ref) {
       connectTimeout: const Duration(seconds: 15),
       receiveTimeout: const Duration(seconds: 30),
       contentType: 'application/json',
+      headers: const {'ngrok-skip-browser-warning': 'true'},
     ),
   );
   dio.interceptors.add(AuthInterceptor(ref.read(secureStorageProvider)));

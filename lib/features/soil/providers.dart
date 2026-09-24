@@ -15,11 +15,11 @@ class SoilController extends Notifier<AsyncValue<SoilAnalysis?>> {
   @override
   AsyncValue<SoilAnalysis?> build() => const AsyncData(null);
 
-  /// Swap `analyzeMock` for `analyze` when the backend is live.
+  /// Analyze soil through the live backend.
   Future<void> analyze(String location) async {
     if (location.trim().isEmpty) return;
     state = const AsyncLoading();
-    final result = await ref.read(soilRepositoryProvider).analyzeMock(
+    final result = await ref.read(soilRepositoryProvider).analyze(
         location.trim(),
         locale: ref.read(languageControllerProvider));
     state = switch (result) {

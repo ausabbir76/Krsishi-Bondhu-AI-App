@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 ///
 /// Values are injected with `--dart-define` (or `--dart-define-from-file`):
 /// ```sh
-/// flutter run --dart-define=API_BASE_URL=https://api.example.com
+/// flutter run --dart-define=API_BASE_URL=https://api.yourdomain.com
 /// flutter build ipa --dart-define-from-file=env/prod.json
 /// ```
 ///
@@ -13,7 +13,7 @@ abstract final class AppEnv {
   /// Base URL for the API client.
   static const String apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'https://api.example.com',
+    defaultValue: 'https://surgery-glowworm-lumpish.ngrok-free.dev',
   );
 
   /// Environment name: `dev`, `staging`, `prod`.

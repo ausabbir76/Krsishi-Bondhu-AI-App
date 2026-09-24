@@ -10,8 +10,7 @@ import 'data/assistant_repository.dart';
 import 'data/chat_message.dart';
 import 'data/chat_session.dart';
 
-/// Repository provider — swap `sendMock` for `send` in [ChatController.send]
-/// when the agent backend is live.
+/// Repository provider for the live assistant backend.
 final assistantRepositoryProvider = Provider<AssistantRepository>(
   (ref) => AssistantRepository(ref.watch(apiClientProvider)),
 );
@@ -125,7 +124,7 @@ class ChatController extends Notifier<ChatState> {
     );
     _upsert(session, sending: true);
 
-    final result = await ref.read(assistantRepositoryProvider).sendMock(
+    final result = await ref.read(assistantRepositoryProvider).send(
           message: trimmed,
           history: session.messages,
           locale: ref.read(languageControllerProvider),

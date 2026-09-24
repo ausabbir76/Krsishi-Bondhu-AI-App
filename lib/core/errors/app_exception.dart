@@ -14,7 +14,7 @@ sealed class AppException implements Exception {
   final StackTrace? stackTrace;
 
   @override
-  String toString() => '$runtimeType: $message';
+  String toString() => message;
 }
 
 /// Network-level failure (no connection, timeout, DNS...).

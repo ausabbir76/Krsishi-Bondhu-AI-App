@@ -13,12 +13,11 @@ final marketRepositoryProvider = Provider<MarketRepository>(
 /// Selected category filter; null = all.
 final marketCategoryProvider = StateProvider<String?>((ref) => null);
 
-/// Daily prices — swap `fetchMockPrices` for `fetchPrices` when the backend
-/// is live.
+/// Daily prices from the live backend.
 final marketPricesProvider = FutureProvider.autoDispose<List<MarketPrice>>((
   ref,
 ) async {
-  final result = await ref.watch(marketRepositoryProvider).fetchMockPrices();
+  final result = await ref.watch(marketRepositoryProvider).fetchPrices();
   return switch (result) {
     Success(:final value) => value,
     Failure(:final error) => throw error,

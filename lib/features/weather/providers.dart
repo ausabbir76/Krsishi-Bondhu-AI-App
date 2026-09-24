@@ -14,15 +14,15 @@ final weatherRepositoryProvider = Provider<WeatherRepository>(
 /// Currently selected district for the forecast.
 final weatherDistrictProvider = StateProvider<String>((ref) => 'Dhaka');
 
-/// Forecast for the selected district — swap `fetchMock` for `fetch` when
-/// the backend is live. Refetches when the app language changes.
+/// Forecast for the selected district from the live backend. Refetches when
+/// the app language changes.
 final weatherForecastProvider =
     FutureProvider.autoDispose<WeatherForecast>((ref) async {
   final district = ref.watch(weatherDistrictProvider);
   final locale = ref.watch(languageControllerProvider);
   final result = await ref
       .watch(weatherRepositoryProvider)
-      .fetchMock(district, locale: locale);
+      .fetch(district, locale: locale);
   return switch (result) {
     Success(:final value) => value,
     Failure(:final error) => throw error,

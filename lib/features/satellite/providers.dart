@@ -14,16 +14,16 @@ final satelliteRepositoryProvider = Provider<SatelliteRepository>(
 /// Currently selected district for satellite analysis.
 final satelliteDistrictProvider = StateProvider<String>((ref) => 'Rangpur');
 
-/// Analysis for the selected district — swap `fetchMock` for `fetch` when
-/// the backend is live. Refetches when the app language changes so the
-/// free-text fields come back in the right language.
+/// Analysis for the selected district from the live backend. Refetches when
+/// the app language changes so the free-text fields come back in the right
+/// language.
 final satelliteAnalysisProvider =
     FutureProvider.autoDispose<SatelliteAnalysis>((ref) async {
   final district = ref.watch(satelliteDistrictProvider);
   final locale = ref.watch(languageControllerProvider);
   final result = await ref
       .watch(satelliteRepositoryProvider)
-      .fetchMock(district, locale: locale);
+      .fetch(district, locale: locale);
   return switch (result) {
     Success(:final value) => value,
     Failure(:final error) => throw error,

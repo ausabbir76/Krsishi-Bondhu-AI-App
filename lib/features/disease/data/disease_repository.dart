@@ -21,11 +21,50 @@ class DiseaseRepository {
       'image': await MultipartFile.fromFile(imagePath),
       'locale': locale,
     });
-    return _api.post<DiseaseResult>(
+    final detection = await _api.post<Map<String, dynamic>>(
       '/disease/detect',
       data: form,
-      decode: (data) => DiseaseResult.fromJson(data as Map<String, dynamic>),
+      decode: (data) => data as Map<String, dynamic>,
     );
+    return switch (detection) {
+      Success(:final value) => Success(
+          DiseaseResult.fromJson(await _withAiAdvice(value, locale: locale)),
+        ),
+      Failure(:final error) => Failure(error),
+    };
+  }
+
+  Future<Map<String, dynamic>> _withAiAdvice(
+    Map<String, dynamic> detectionJson, {
+    required String locale,
+  }) async {
+    final adviceResult = await _api.post<Map<String, dynamic>>(
+      '/advise',
+      data: detectionJson,
+      decode: (data) => data as Map<String, dynamic>,
+    );
+    return switch (adviceResult) {
+      Success(:final value) => {
+          ...detectionJson,
+          'advice': _localizedAdvice(value['advice'], locale),
+        },
+      Failure() => detectionJson,
+    };
+  }
+
+  String? _localizedAdvice(Object? advice, String locale) {
+    if (advice is String && advice.trim().isNotEmpty) return advice.trim();
+    if (advice is Map<String, dynamic>) {
+      final preferred = advice[locale];
+      if (preferred is String && preferred.trim().isNotEmpty) {
+        return preferred.trim();
+      }
+      final fallback = advice['en'] ?? advice['bn'] ?? advice['text'];
+      if (fallback is String && fallback.trim().isNotEmpty) {
+        return fallback.trim();
+      }
+    }
+    return null;
   }
 
   /// Mock analysis until the vision backend exists.

@@ -304,6 +304,7 @@ class _ResultView extends StatelessWidget {
     final primary = KrishiColors.primary.resolveFrom(context);
     final severityColor = _severityColor(result.severity);
     final percent = (result.confidence * 100).round();
+    final aiAdvice = result.aiAdvice?.trim();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -388,26 +389,35 @@ class _ResultView extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.cardGap),
-        _TreatmentCard(
-          icon: CupertinoIcons.leaf_arrow_circlepath,
-          color: AppColors.green,
-          title: l10n.organicTreatment,
-          body: result.organicTreatment,
-        ),
-        const SizedBox(height: AppSpacing.cardGap),
-        _TreatmentCard(
-          icon: CupertinoIcons.drop_fill,
-          color: AppColors.blue,
-          title: l10n.chemicalTreatment,
-          body: result.chemicalTreatment,
-        ),
-        const SizedBox(height: AppSpacing.cardGap),
-        _TreatmentCard(
-          icon: CupertinoIcons.shield_fill,
-          color: AppColors.orange,
-          title: l10n.prevention,
-          body: result.prevention,
-        ),
+        if (aiAdvice != null && aiAdvice.isNotEmpty)
+          _TreatmentCard(
+            icon: CupertinoIcons.sparkles,
+            color: AppColors.green,
+            title: 'AI suggestions',
+            body: aiAdvice,
+          )
+        else ...[
+          _TreatmentCard(
+            icon: CupertinoIcons.leaf_arrow_circlepath,
+            color: AppColors.green,
+            title: l10n.organicTreatment,
+            body: result.organicTreatment,
+          ),
+          const SizedBox(height: AppSpacing.cardGap),
+          _TreatmentCard(
+            icon: CupertinoIcons.drop_fill,
+            color: AppColors.blue,
+            title: l10n.chemicalTreatment,
+            body: result.chemicalTreatment,
+          ),
+          const SizedBox(height: AppSpacing.cardGap),
+          _TreatmentCard(
+            icon: CupertinoIcons.shield_fill,
+            color: AppColors.orange,
+            title: l10n.prevention,
+            body: result.prevention,
+          ),
+        ],
       ],
     );
   }
